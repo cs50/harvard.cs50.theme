@@ -102,7 +102,6 @@ define(function(require, exports, module) {
         function showButton(show) {
             if (!button)
                 return;
-
             button.setAttribute("visible", show);
         }
 
