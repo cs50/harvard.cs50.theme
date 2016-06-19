@@ -64,7 +64,7 @@ define(function(require, exports, module) {
 
             // style button
             styleButton();
-            
+
             // re-style button whenever theme changes
             imports.settings.on('user/general/@skin', function(value) {
                 styleButton();
@@ -106,7 +106,19 @@ define(function(require, exports, module) {
                 button.setAttribute('class', themes.light.class);
             }
         }
-        
+
+        /**
+         * Shows/hides button.
+         *
+         * @param {boolean} show show/hide flag.
+         */
+        function showButton(show) {
+            if (!button)
+                return;
+
+            button.setAttribute("visible", show);
+        }
+
         /**
          * Toggles theme from dark to light or from light to dark.
          */
@@ -120,5 +132,7 @@ define(function(require, exports, module) {
                 imports.settings.set('user/ace/@theme', themes.dark.ace);
             }
         }
+
+        plugin.freezePublicAPI({showButton: showButton});
     }
 });
