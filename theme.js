@@ -95,6 +95,18 @@ define(function(require, exports, module) {
         });
 
         /**
+         * Shows/hides button.
+         *
+         * @param {boolean} show show/hide flag.
+         */
+        function showButton(show) {
+            if (!button)
+                return;
+
+            button.setAttribute("visible", show);
+        }
+
+        /**
          * Styles button based on current theme.
          */
         function styleButton() {
@@ -105,18 +117,6 @@ define(function(require, exports, module) {
             else {
                 button.setAttribute('class', themes.light.class);
             }
-        }
-
-        /**
-         * Shows/hides button.
-         *
-         * @param {boolean} show show/hide flag.
-         */
-        function showButton(show) {
-            if (!button)
-                return;
-
-            button.setAttribute("visible", show);
         }
 
         /**
