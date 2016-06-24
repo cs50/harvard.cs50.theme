@@ -83,7 +83,7 @@ define(function(require, exports, module) {
 
         // when plugin is unloaded
         plugin.on("unload", function() {
-            showButton(false);
+            button.removeNode();
             button = null;
         });
 
