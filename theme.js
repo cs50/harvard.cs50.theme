@@ -93,14 +93,21 @@ define(function(require, exports, module) {
         });
 
         /**
-         * Shows/hides button.
-         *
-         * @param {boolean} show show/hide flag.
+         * Hides theme button.
          */
-        function showButton(show) {
+        function hideButton() {
             if (!button)
                 return;
-            button.setAttribute("visible", show);
+            button.hide();
+        }
+
+        /**
+         * Shows theme button.
+         */
+        function showButton() {
+            if (!button)
+                return;
+            button.show();
         }
 
         /**
@@ -130,6 +137,17 @@ define(function(require, exports, module) {
             }
         }
 
-        plugin.freezePublicAPI({showButton: showButton});
+        plugin.freezePublicAPI({
+
+            /**
+             * Hides theme button.
+             */
+            hideButton: hideButton,
+
+            /**
+             * Shows theme button.
+             */
+            showButton: showButton,
+        });
     }
 });
