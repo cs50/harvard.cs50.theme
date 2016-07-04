@@ -6,7 +6,7 @@ define(function(require, exports, module) {
     ];
 
     // APIs provided
-    main.provides = ["c9.ide.cs50.theme"];
+    main.provides = ["harvard.cs50.theme"];
 
     // plugin
     return main;
@@ -89,7 +89,7 @@ define(function(require, exports, module) {
 
         // register plugin
         register(null, {
-            "c9.ide.cs50.theme": plugin
+            "harvard.cs50.theme": plugin
         });
 
         /**
