@@ -16,16 +16,20 @@ define(function(require, exports, module) {
      */
     function main(options, imports, register) {
 
+        // variable to make new item in menu
         var ui = imports.ui;
+
+        // variable to access the menu
         var menus = imports.menus;
+
+        // global variable for menu item
         var menuItem = null;
+
+        // global variable for current theme
         var currentTheme = null;
 
         // instantiate plugin
         var plugin = new imports.Plugin("CS50", main.consumes);
-
-        // button for menu
-        var button = null;
 
         // themes
         var themes = {
@@ -57,14 +61,6 @@ define(function(require, exports, module) {
             );
             menus.addItemByPath("View/Toggle Theme", menuItem, 4, plugin);
 
-            // create button
-            button = new imports.ui.button({
-                "command": "toggleTheme",
-                "skin": "c9-menu-btn",
-                "tooltip": "Theme",
-                "visible": false
-            });
-
             // register command for button
             imports.commands.addCommand({
                 exec: toggleTheme,
@@ -72,35 +68,21 @@ define(function(require, exports, module) {
                 name: "toggleTheme"
             }, plugin);
 
-            // load CSS for button
-            imports.ui.insertCss(require("text!./style.css"), options.staticPrefix, plugin);
+            // get the current theme
+            setTheme();
 
-            // style button
-            styleButton();
-
-            // re-style button whenever theme changes
+            // reset global var whenever style changes
             imports.settings.on("user/general/@skin", function(value) {
-                styleButton();
+                setTheme();
             }, plugin);
 
             // prefetch theme not in use
-            if (button.getAttribute("class") == themes.dark.class) {
+            if (currentTheme == themes.dark.class) {
                 imports["layout.preload"].getTheme(themes.light.skin, function() {});
             }
             else {
                 imports["layout.preload"].getTheme(themes.dark.skin, function() {});
             }
-
-            // insert button into menu
-            imports.ui.insertByIndex(imports.layout.findParent({
-                name: "preferences"
-            }), button, 0, plugin);
-        });
-
-        // when plugin is unloaded
-        plugin.on("unload", function() {
-            button.removeNode();
-            button = null;
         });
 
         // register plugin
@@ -109,34 +91,14 @@ define(function(require, exports, module) {
         });
 
         /**
-         * Hides theme button.
+         * Sets global var 'currentTheme' to the current theme.
          */
-        function hideButton() {
-            if (!button)
-                return;
-            button.hide();
-        }
-
-        /**
-         * Shows theme button.
-         */
-        function showButton() {
-            if (!button)
-                return;
-            button.show();
-        }
-
-        /**
-         * Styles button based on current theme.
-         */
-        function styleButton() {
+        function setTheme() {
             var skin = imports.settings.get("user/general/@skin");
             if (themes.dark.skins.indexOf(skin) !== -1) {
-                button.setAttribute("class", themes.dark.class);
                 currentTheme = themes.dark.class;
             }
             else {
-                button.setAttribute("class", themes.light.class);
                 currentTheme = themes.light.class;
             }
         }
@@ -154,18 +116,5 @@ define(function(require, exports, module) {
                 imports.settings.set("user/ace/@theme", themes.dark.ace);
             }
         }
-
-        plugin.freezePublicAPI({
-
-            /**
-             * Hides theme button.
-             */
-            hideButton: hideButton,
-
-            /**
-             * Shows theme button.
-             */
-            showButton: showButton,
-        });
     }
 });
