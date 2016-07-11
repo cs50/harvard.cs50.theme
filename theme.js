@@ -16,6 +16,10 @@ define(function(require, exports, module) {
      */
     function main(options, imports, register) {
 
+        var ui = imports.ui;
+        var menus = imports.menus;
+        var menuItem = null;
+
         // instantiate plugin
         var plugin = new imports.Plugin("CS50", main.consumes);
 
@@ -41,12 +45,23 @@ define(function(require, exports, module) {
         // when plugin is loaded
         plugin.on("load", function() {
 
+            menuItem = new ui.item({
+                type: "check",
+                caption: "ToggleTheme",
+                onclick: toggleTheme
+            });
+
+            menus.addItemByPath(
+                "View/PresentationDiv", new ui.divider(), 3, plugin
+            );
+            menus.addItemByPath("View/Toggle Theme", menuItem, 4, plugin);
+
             // create button
             button = new imports.ui.button({
                 "command": "toggleTheme",
                 "skin": "c9-menu-btn",
                 "tooltip": "Theme",
-                "visible": true
+                "visible": false
             });
 
             // register command for button
