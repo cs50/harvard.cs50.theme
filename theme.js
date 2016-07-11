@@ -19,6 +19,7 @@ define(function(require, exports, module) {
         var ui = imports.ui;
         var menus = imports.menus;
         var menuItem = null;
+        var currentTheme = null;
 
         // instantiate plugin
         var plugin = new imports.Plugin("CS50", main.consumes);
@@ -132,9 +133,11 @@ define(function(require, exports, module) {
             var skin = imports.settings.get("user/general/@skin");
             if (themes.dark.skins.indexOf(skin) !== -1) {
                 button.setAttribute("class", themes.dark.class);
+                currentTheme = themes.dark.class;
             }
             else {
                 button.setAttribute("class", themes.light.class);
+                currentTheme = themes.light.class;
             }
         }
 
@@ -142,7 +145,7 @@ define(function(require, exports, module) {
          * Toggles theme from dark to light or from light to dark.
          */
         function toggleTheme() {
-            if (button.getAttribute("class") === themes.dark.class) {
+            if (currentTheme === themes.dark.class) {
                 imports.layout.resetTheme(themes.light.skin, "ace");
                 imports.settings.set("user/ace/@theme", themes.light.ace);
             }
