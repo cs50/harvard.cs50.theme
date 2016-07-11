@@ -59,7 +59,7 @@ define(function(require, exports, module) {
             menus.addItemByPath(
                 "View/PresentationDiv", new ui.divider(), 3, plugin
             );
-            menus.addItemByPath("View/Toggle Theme", menuItem, 4, plugin);
+            menus.addItemByPath("View/Night Mode", menuItem, 4, plugin);
 
             // register command for button
             imports.commands.addCommand({
