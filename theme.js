@@ -56,10 +56,7 @@ define(function(require, exports, module) {
                 onclick: toggleTheme
             });
 
-            menus.addItemByPath(
-                "View/PresentationDiv", new ui.divider(), 3, plugin
-            );
-            menus.addItemByPath("View/Night Mode", menuItem, 4, plugin);
+            menus.addItemByPath("View/Night Mode", menuItem, 2, plugin);
 
             // register command for button
             imports.commands.addCommand({
@@ -72,9 +69,7 @@ define(function(require, exports, module) {
             setTheme();
 
             // reset global var whenever style changes
-            imports.settings.on("user/general/@skin", function(value) {
-                setTheme();
-            }, plugin);
+            imports.settings.on("user/general/@skin", setTheme, plugin);
 
             // prefetch theme not in use
             if (currentTheme == themes.dark.class) {
@@ -116,5 +111,7 @@ define(function(require, exports, module) {
                 imports.settings.set("user/ace/@theme", themes.dark.ace);
             }
         }
+
+        plugin.freezePublicAPI({});
     }
 });
