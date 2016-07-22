@@ -95,12 +95,12 @@ define(function(require, exports, module) {
          */
         function toggleTheme() {
             if (night) {
-                layout.resetTheme(themes.light.skin, "ace");
                 settings.set("user/ace/@theme", themes.light.ace);
+                layout.resetTheme(themes.light.skin, "ace");
             }
             else {
-                layout.resetTheme(themes.dark.skin, "ace");
                 settings.set("user/ace/@theme", themes.dark.ace);
+                layout.resetTheme(themes.dark.skin, "ace");
             }
         }
 
