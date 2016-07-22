@@ -2,7 +2,8 @@ define(function(require, exports, module) {
 
     // APIs consumed
     main.consumes = [
-        "commands", "layout", "layout.preload", "menus", "Plugin", "settings", "ui"
+        "commands", "layout", "layout.preload", "menus", "Plugin", "settings",
+        "ui"
     ];
 
     // APIs provided
@@ -15,18 +16,17 @@ define(function(require, exports, module) {
      * Implements plugin.
      */
     function main(options, imports, register) {
-
-        // variable to make new item in menu
+        var commands = imports.commands;
+        var layout = imports.layout;
+        var menus = imports.menus;
+        var preload = imports["layout.preload"];
+        var settings = imports.settings;
         var ui = imports.ui;
 
-        // variable to access the menu
-        var menus = imports.menus;
-
-        // global variable for menu item
         var menuItem = null;
 
-        // global variable for current theme
-        var currentTheme = null;
+        // whether night mode is on
+        var night = false;
 
         // instantiate plugin
         var plugin = new imports.Plugin("CS50", main.consumes);
@@ -35,49 +35,45 @@ define(function(require, exports, module) {
         var themes = {
             dark: {
                 ace: "ace/theme/cloud9_night",
-                class: "cs50-theme-dark",
-                skin: "flat-dark", // default
-                skins: ["dark", "dark-gray", "flat-dark"]
+                skin: "flat-dark" // default
             },
             light: {
                 ace: "ace/theme/cloud9_day",
-                class: "cs50-theme-light",
-                skin: "flat-light", // default
-                skins: ["light", "light-gray", "flat-light"]
+                skin: "flat-light" // default
             }
         };
 
         // when plugin is loaded
         plugin.on("load", function() {
-
+            // create "View/Night Mode" menu item
             menuItem = new ui.item({
                 type: "check",
                 caption: "ToggleTheme",
                 onclick: toggleTheme
             });
-
             menus.addItemByPath("View/Night Mode", menuItem, 2, plugin);
 
-            // register command for button
-            imports.commands.addCommand({
+            // create theme-toggling command
+            commands.addCommand({
                 exec: toggleTheme,
                 group: "CS50",
                 name: "toggleTheme"
             }, plugin);
 
-            // get the current theme
-            setTheme();
+            // update night mode settings initially
+            updateNight();
 
-            // reset global var whenever style changes
-            imports.settings.on("user/general/@skin", setTheme, plugin);
+            // update night mode settings on external theme-changing
+            settings.on("user/general/@skin", updateNight, plugin);
 
             // prefetch theme not in use
-            if (currentTheme == themes.dark.class) {
-                imports["layout.preload"].getTheme(themes.light.skin, function() {});
-            }
-            else {
-                imports["layout.preload"].getTheme(themes.dark.skin, function() {});
-            }
+            var themeToPreload = night ? themes.light.skin : themes.dark.skin;
+            preload.getTheme(themeToPreload, function() {});
+        });
+
+        plugin.on("unload", function() {
+            night = false;
+            menuItem = null;
         });
 
         // register plugin
@@ -86,29 +82,25 @@ define(function(require, exports, module) {
         });
 
         /**
-         * Sets global var 'currentTheme' to the current theme.
+         * Sets and updates global variable 'night' to whether night mode is on,
+         * and syncs "View/Night Mode" menu item.
          */
-        function setTheme() {
-            var skin = imports.settings.get("user/general/@skin");
-            if (themes.dark.skins.indexOf(skin) !== -1) {
-                currentTheme = themes.dark.class;
-            }
-            else {
-                currentTheme = themes.light.class;
-            }
+        function updateNight() {
+            night = settings.get("user/general/@skin").indexOf("dark") !== -1;
+            menuItem.setAttribute("checked", night);
         }
 
         /**
          * Toggles theme from dark to light or from light to dark.
          */
         function toggleTheme() {
-            if (currentTheme === themes.dark.class) {
-                imports.layout.resetTheme(themes.light.skin, "ace");
-                imports.settings.set("user/ace/@theme", themes.light.ace);
+            if (night) {
+                settings.set("user/ace/@theme", themes.light.ace);
+                layout.resetTheme(themes.light.skin, "ace");
             }
             else {
-                imports.layout.resetTheme(themes.dark.skin, "ace");
-                imports.settings.set("user/ace/@theme", themes.dark.ace);
+                settings.set("user/ace/@theme", themes.dark.ace);
+                layout.resetTheme(themes.dark.skin, "ace");
             }
         }
 
