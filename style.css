@@ -1,12 +1,12 @@
 /* http://www.thecssninja.com/css/even-better-image-preloading-with-css2 */
 body:after {
-    content: url("@{image-path}/off.png") url("@{image-path}/on.png");
+    content: url("@{plugin-path}/images/off.png") url("@{plugin-path}/images/on.png");
     display: none;
 }
 
 /* dark theme */
 .cs50-theme-dark {
-    background-image: url("@{image-path}/off.png");
+    background-image: url("@{plugin-path}/images/off.png");
     background-position: center center;
     background-repeat: no-repeat;
     background-size: 24px 24px;
@@ -14,7 +14,7 @@ body:after {
 
 /* light theme */
 .cs50-theme-light {
-    background-image: url("@{image-path}/on.png");
+    background-image: url("@{plugin-path}/images/on.png");
     background-position: center center;
     background-repeat: no-repeat;
     background-size: 24px 24px;
