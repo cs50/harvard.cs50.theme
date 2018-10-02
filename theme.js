@@ -16,26 +16,26 @@ define(function(require, exports, module) {
      * Implements plugin.
      */
     function main(options, imports, register) {
-        var commands = imports.commands;
-        var layout = imports.layout;
-        var menus = imports.menus;
-        var preload = imports["layout.preload"];
-        var settings = imports.settings;
-        var ui = imports.ui;
+        const commands = imports.commands;
+        const layout = imports.layout;
+        const menus = imports.menus;
+        const preload = imports["layout.preload"];
+        const settings = imports.settings;
+        const ui = imports.ui;
 
-        var menuItem = null;
+        let menuItem = null;
 
-        // whether night mode is on
-        var night = false;
+        // Night mode flag
+        let night = false;
 
-        // instantiate plugin
-        var plugin = new imports.Plugin("CS50", main.consumes);
+        // Instantiate plugin
+        const plugin = new imports.Plugin("CS50", main.consumes);
 
-        // themes
-        var themes = {
+        // Themes
+        const themes = {
             dark: {
                 ace: "ace/theme/cloud9_night",
-                skin: "flat-dark" // default
+                skin: "flat-dark"
             },
             light: {
                 ace: "ace/theme/cloud9_day",
@@ -43,40 +43,40 @@ define(function(require, exports, module) {
             }
         };
 
-        // when plugin is loaded
-        plugin.on("load", function() {
-            // create "View/Night Mode" menu item
+        // When plugin is loaded
+        plugin.on("load", () => {
+            // Create "View/Night Mode" menu item
             menuItem = new ui.item({
                 type: "check",
                 caption: "ToggleTheme",
                 onclick: toggleTheme
             });
+
             menus.addItemByPath("View/Night Mode", menuItem, 2, plugin);
 
-            // create theme-toggling command
+            // Create theme-toggling command
             commands.addCommand({
                 exec: toggleTheme,
                 group: "CS50",
                 name: "toggleTheme"
             }, plugin);
 
-            // update night mode settings initially
+            // Update night mode settings initially
             updateNight();
 
-            // update night mode settings on external theme-changing
+            // Update night mode settings on external theme-changing
             settings.on("user/general/@skin", updateNight, plugin);
 
-            // prefetch theme not in use
-            var themeToPreload = night ? themes.light.skin : themes.dark.skin;
-            preload.getTheme(themeToPreload, function() {});
+            // Prefetch theme not in use
+            preload.getTheme(night ? themes.light.skin : themes.dark.skin, () => {});
         });
 
-        plugin.on("unload", function() {
+        plugin.on("unload", () => {
             night = false;
             menuItem = null;
         });
 
-        // register plugin
+        // Register plugin
         register(null, {
             "harvard.cs50.theme": plugin
         });
