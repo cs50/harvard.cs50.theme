@@ -2,7 +2,7 @@ define(function(require, exports, module) {
 
     // APIs consumed
     main.consumes = [
-        "commands", "layout", "layout.preload", "menus", "Plugin", "settings",
+        "layout", "layout.preload", "MenuItem", "menus", "Plugin", "settings",
         "ui"
     ];
 
@@ -16,17 +16,17 @@ define(function(require, exports, module) {
      * Implements plugin.
      */
     function main(options, imports, register) {
-        const commands = imports.commands;
         const layout = imports.layout;
         const menus = imports.menus;
+        const MenuItem = imports.MenuItem;
         const preload = imports["layout.preload"];
         const settings = imports.settings;
         const ui = imports.ui;
 
-        let menuItem = null;
+        let menuItem;
 
-        // Night mode flag
-        let night = false;
+        // Dark mode flag
+        let dark = false;
 
         // Instantiate plugin
         const plugin = new imports.Plugin("CS50", main.consumes);
@@ -37,43 +37,42 @@ define(function(require, exports, module) {
                 ace: "ace/theme/cloud9_night",
                 skin: "flat-dark"
             },
+
+            // Default
             light: {
                 ace: "ace/theme/cloud9_day",
-                skin: "flat-light" // default
+                skin: "flat-light"
             }
         };
 
         // When plugin is loaded
         plugin.on("load", () => {
-            // Create "View/Night Mode" menu item
-            menuItem = new ui.item({
+            // Create "View/Dark Mode" menu item
+            menuItem = new MenuItem({
                 type: "check",
-                caption: "ToggleTheme",
-                onclick: toggleTheme
+                caption: "Dark Mode",
+                onclick: () => {
+                    if (dark) {
+                        settings.set("user/ace/@theme", themes.light.ace);
+                        layout.resetTheme(themes.light.skin, "ace");
+                    }
+                    else {
+                        settings.set("user/ace/@theme", themes.dark.ace);
+                        layout.resetTheme(themes.dark.skin, "ace");
+                    }
+                }
             });
 
-            menus.addItemByPath("View/Night Mode", menuItem, 2, plugin);
-
-            // Create theme-toggling command
-            commands.addCommand({
-                exec: toggleTheme,
-                group: "CS50",
-                name: "toggleTheme"
-            }, plugin);
-
-            // Update night mode settings initially
-            updateNight();
-
-            // Update night mode settings on external theme-changing
-            settings.on("user/general/@skin", updateNight, plugin);
+            menus.addItemByPath("View/Dark Mode", menuItem, 2, plugin);
 
             // Prefetch theme not in use
-            preload.getTheme(night ? themes.light.skin : themes.dark.skin, () => {});
-        });
+            preload.getTheme(dark ? themes.light.skin : themes.dark.skin, () => {});
 
-        plugin.on("unload", () => {
-            night = false;
-            menuItem = null;
+            // Update dark mode settings on external theme-changing
+            settings.on("user/general/@skin", updateDark, plugin);
+
+            // Update dark mode settings initially
+            updateDark();
         });
 
         // Register plugin
@@ -82,26 +81,12 @@ define(function(require, exports, module) {
         });
 
         /**
-         * Sets and updates global variable 'night' to whether night mode is on,
-         * and syncs "View/Night Mode" menu item.
+         * Sets and updates global variable 'dark' to whether dark mode is on,
+         * and syncs "View/Dark Mode" menu item.
          */
-        function updateNight() {
-            night = settings.get("user/general/@skin").indexOf("dark") !== -1;
-            menuItem.setAttribute("checked", night);
-        }
-
-        /**
-         * Toggles theme from dark to light or from light to dark.
-         */
-        function toggleTheme() {
-            if (night) {
-                settings.set("user/ace/@theme", themes.light.ace);
-                layout.resetTheme(themes.light.skin, "ace");
-            }
-            else {
-                settings.set("user/ace/@theme", themes.dark.ace);
-                layout.resetTheme(themes.dark.skin, "ace");
-            }
+        function updateDark() {
+            dark = settings.get("user/general/@skin").indexOf("dark") !== -1;
+            menuItem.checked = dark;
         }
 
         plugin.freezePublicAPI({});
